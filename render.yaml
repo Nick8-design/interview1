@@ -1,5 +1,11 @@
+# ------------------------------
+# RENDER SERVICES CONFIGURATION
+# ------------------------------
+
 services:
+  # ------------------------------
   # BACKEND DJANGO
+  # ------------------------------
   - type: web
     name: crm-backend
     env: docker
@@ -35,7 +41,9 @@ services:
       gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
       "
 
+  # ------------------------------
   # CELERY WORKER
+  # ------------------------------
   - type: worker
     name: celery-worker
     env: docker
@@ -61,7 +69,9 @@ services:
       - key: DEBUG
         value: False
 
+  # ------------------------------
   # CELERY BEAT
+  # ------------------------------
   - type: worker
     name: celery-beat
     env: docker
@@ -87,25 +97,29 @@ services:
       - key: DEBUG
         value: False
 
+  # ------------------------------
   # FRONTEND (STATIC SITE)
+  # ------------------------------
   - type: static
     name: crm-frontend
-    staticPublishPath: dist
-    buildCommand: "npm install && npm run build"
-    publishPath: ./frontend/dist
     rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    publishPath: dist
     envVars:
       - key: VITE_API_URL
         value: https://crm-backend.onrender.com
 
+  # ------------------------------
+  # REDIS
+  # ------------------------------
+  - type: redis
+    name: crm-redis
+    plan: free
+
+# ------------------------------
 # DATABASES
+# ------------------------------
 databases:
   - name: crm-db
     plan: free
     postgresMajorVersion: 15
-
-# REDIS
-services:
-  - type: redis
-    name: crm-redis
-    plan: free
